@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     ANGEL_API_KEY: str = ""
     ANGEL_CLIENT_ID: str = ""
-    ANGEL_PIN: str = ""
+    ANGEL_PASSWORD: str = ""
     ANGEL_TOTP_SECRET: str = ""
 
     model_config = SettingsConfigDict(

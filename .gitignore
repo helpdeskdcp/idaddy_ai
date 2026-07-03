@@ -21,3 +21,6 @@ models/
 
 # OS
 .DS_Store
+*.pyc
+*.bak
+__pycache__/
