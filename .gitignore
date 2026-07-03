@@ -1,0 +1,23 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment
+.env
+
+# Logs
+logs/
+
+# Data
+data/
+models/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
