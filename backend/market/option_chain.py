@@ -51,3 +51,22 @@ class OptionChainService:
             "CE": sorted(ce, key=lambda x: x["expiry"]),
             "PE": sorted(pe, key=lambda x: x["expiry"]),
         }
+
+    def nearest_expiry(self, symbol: str):
+
+        opts = self.options(symbol, self.atm_strike(symbol))
+
+        if not opts["CE"]:
+            return None
+
+        return opts["CE"][0]["expiry"]
+
+
+    def option_ltp(self, option):
+
+        return self.market.get_ltp(
+            option["exch_seg"],
+            option["symbol"],
+            option["token"],
+        )["data"]["ltp"]
+
