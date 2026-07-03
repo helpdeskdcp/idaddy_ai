@@ -18,6 +18,8 @@ class AngelAuth:
             api_key=self.settings.ANGEL_API_KEY
         )
 
+        self.api = self.client
+
         self.session = None
         self.jwt_token = None
         self.refresh_token = None
@@ -27,7 +29,6 @@ class AngelAuth:
         """
         Login to Angel One
         """
-
         totp = pyotp.TOTP(
             self.settings.ANGEL_TOTP_SECRET
         ).now()
@@ -52,10 +53,6 @@ class AngelAuth:
         return self.session
 
     def logout(self):
-        """
-        Logout
-        """
-
         try:
             return self.client.terminateSession(
                 self.settings.ANGEL_CLIENT_ID
@@ -64,10 +61,6 @@ class AngelAuth:
             return False
 
     def get_profile(self):
-        """
-        User Profile
-        """
-
         if self.refresh_token is None:
             raise Exception("Not logged in")
 
@@ -76,18 +69,10 @@ class AngelAuth:
         )
 
     def get_feed_token(self):
-        """
-        Feed Token
-        """
-
         if self.feed_token is None:
             raise Exception("Login first")
 
         return self.feed_token
 
     def get_client(self):
-        """
-        Return SmartConnect object
-        """
-
         return self.client

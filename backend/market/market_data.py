@@ -1,29 +1,27 @@
-from SmartApi import SmartConnect
-
 from backend.broker.angelone.auth import AngelAuth
-from backend.core.logger import logger
+from backend.market.token_search import TokenSearch
 
 
 class MarketDataService:
+
     def __init__(self):
         self.auth = AngelAuth()
-        self.session = self.auth.login()
-        self.client: SmartConnect = self.auth.client
+        self.auth.login()
+        self.api = self.auth.api
+        self.tokens = TokenSearch()
 
-    def get_ltp(self, exchange: str, tradingsymbol: str, symboltoken: str):
-        try:
-            data = self.client.ltpData(
-                exchange=exchange,
-                tradingsymbol=tradingsymbol,
-                symboltoken=symboltoken,
-            )
+    def get_profile(self):
+        return self.auth.get_profile()
 
-            logger.info(
-                f"LTP {tradingsymbol} : {data['data']['ltp']}"
-            )
+    def get_token(self, symbol: str):
+        return self.tokens.exact(symbol)
 
-            return data
+    def get_future(self, symbol: str):
+        return self.tokens.nearest_future(symbol)
 
-        except Exception as e:
-            logger.exception(e)
-            return None
+    def get_ltp(self, exchange: str, tradingsymbol: str, token: str):
+        return self.api.ltpData(
+            exchange,
+            tradingsymbol,
+            token
+        )
