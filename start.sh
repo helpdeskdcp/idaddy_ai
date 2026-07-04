@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Clean previous Python environment
 unset VIRTUAL_ENV
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 hash -r
@@ -8,6 +7,12 @@ hash -r
 cd /root/idaddy_ai || exit 1
 
 source /root/idaddy_ai/venv/bin/activate
+
+if pgrep -f "uvicorn backend.main:app" >/dev/null; then
+    echo "IDaddy AI is already running."
+    ./status.sh
+    exit 0
+fi
 
 echo "=================================="
 echo "IDaddy AI Starting..."
