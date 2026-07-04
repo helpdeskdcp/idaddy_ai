@@ -19,6 +19,8 @@ class MarketWebSocket:
 
     def on_open(self, ws):
         print("WebSocket Connected")
+        self.subscribe(1, "26000")
+        print("Subscribed : NIFTY (26000)")
 
     def on_data(self, ws, message):
         print(message)
@@ -37,3 +39,19 @@ class MarketWebSocket:
         self.ws.on_close = self.on_close
 
         self.ws.connect()
+
+    def subscribe(self, exchange_type: int, token: str):
+
+        self.ws.subscribe(
+            correlation_id="idaddy",
+            mode=1,
+            token_list=[
+                {
+                    "exchangeType": exchange_type,
+                    "tokens": [token],
+                }
+            ],
+        )
+
+        print(f"Subscribed : {token}")
+
