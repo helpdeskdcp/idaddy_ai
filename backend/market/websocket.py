@@ -1,6 +1,7 @@
 from SmartApi.smartWebSocketV2 import SmartWebSocketV2
 
 from backend.broker.angelone.auth import AngelAuth
+from backend.market.token_search import TokenSearch
 
 
 class MarketWebSocket:
@@ -9,6 +10,7 @@ class MarketWebSocket:
 
         self.auth = AngelAuth()
         self.auth.login()
+        self.tokens = TokenSearch()
 
         self.ws = SmartWebSocketV2(
             self.auth.jwt_token,
@@ -19,8 +21,7 @@ class MarketWebSocket:
 
     def on_open(self, ws):
         print("WebSocket Connected")
-        self.subscribe(1, "26000")
-        print("Subscribed : NIFTY (26000)")
+        self.subscribe_symbol("NIFTY")
 
     def on_data(self, ws, message):
         print(message)
@@ -54,4 +55,35 @@ class MarketWebSocket:
         )
 
         print(f"Subscribed : {token}")
+
+
+    def subscribe_symbol(self, symbol: str):
+
+        item = self.tokens.exact(symbol)
+
+        if not item:
+            raise Exception(f"Symbol not found: {symbol}")
+
+        exch_map = {
+            "NSE": 1,
+            "NFO": 2,
+            "BSE": 3,
+            "MCX": 5,
+        }
+
+        exch = exch_map.get(item["exch_seg"])
+
+        if exch is None:
+            raise Exception(
+                f"Unsupported exchange: {item['exch_seg']}"
+            )
+
+        self.subscribe(
+            exch,
+            item["token"],
+        )
+
+        print(
+            f"{symbol} -> {item['token']} ({item['exch_seg']})"
+        )
 
