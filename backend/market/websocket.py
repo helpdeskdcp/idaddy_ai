@@ -1,4 +1,5 @@
 from SmartApi.smartWebSocketV2 import SmartWebSocketV2
+import threading
 
 from backend.broker.angelone.auth import AngelAuth
 from backend.market.token_search import TokenSearch
@@ -6,11 +7,13 @@ from backend.market.token_search import TokenSearch
 
 class MarketWebSocket:
 
-    def __init__(self):
+    def __init__(self, debug=False):
 
         self.auth = AngelAuth()
         self.auth.login()
         self.tokens = TokenSearch()
+        self.ticks = {}
+        self.debug = debug
 
         self.ws = SmartWebSocketV2(
             self.auth.jwt_token,
@@ -24,7 +27,11 @@ class MarketWebSocket:
         self.subscribe_symbol("NIFTY")
 
     def on_data(self, ws, message):
-        print(message)
+        token = message.get("token")
+        self.ticks[token] = message
+
+        if self.debug:
+            print(message)
 
     def on_error(self, ws, error):
         print("ERROR:", error)
@@ -86,4 +93,24 @@ class MarketWebSocket:
         print(
             f"{symbol} -> {item['token']} ({item['exch_seg']})"
         )
+
+
+    def get_tick(self, token):
+        return self.ticks.get(token)
+
+
+    def start(self):
+
+        self.thread = threading.Thread(
+            target=self.connect,
+            daemon=True,
+        )
+
+        self.thread.start()
+
+
+    def subscribe_symbols(self, symbols):
+
+        for symbol in symbols:
+            self.subscribe_symbol(symbol)
 
