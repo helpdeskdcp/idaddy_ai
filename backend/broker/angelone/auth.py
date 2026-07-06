@@ -76,3 +76,6 @@ class AngelAuth:
 
     def get_client(self):
         return self.client
+
+    def get_api(self):
+        return self.api
