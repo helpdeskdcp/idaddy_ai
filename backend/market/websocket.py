@@ -13,6 +13,7 @@ class MarketWebSocket:
         self.auth.login()
         self.tokens = TokenSearch()
         self.ticks = {}
+        self.token_map = {}
         self.debug = debug
 
         self.ws = SmartWebSocketV2(
@@ -24,11 +25,23 @@ class MarketWebSocket:
 
     def on_open(self, ws):
         print("WebSocket Connected")
-        self.subscribe_symbol("NIFTY")
+
+        self.subscribe_symbols([
+            "NIFTY",
+            "BANKNIFTY",
+            "FINNIFTY",
+            "SENSEX",
+        ])
 
     def on_data(self, ws, message):
         token = message.get("token")
-        self.ticks[token] = message
+
+        symbol = self.token_map.get(token)
+
+        if symbol:
+            self.ticks[symbol] = message
+        else:
+            self.ticks[token] = message
 
         if self.debug:
             print(message)
@@ -89,6 +102,8 @@ class MarketWebSocket:
             exch,
             item["token"],
         )
+
+        self.token_map[item["token"]] = symbol
 
         print(
             f"{symbol} -> {item['token']} ({item['exch_seg']})"
